@@ -63,6 +63,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
+	fileprivate let avatarImageView = UIImageView()
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -79,6 +80,7 @@ final class ReviewCell: UITableViewCell {
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
+		avatarImageView.frame = layout.avatarImageViewFrame
     }
 
 }
@@ -91,6 +93,7 @@ private extension ReviewCell {
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+		setupAvatarImageView()
     }
 
     func setupReviewTextLabel() {
@@ -107,6 +110,15 @@ private extension ReviewCell {
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
     }
+	
+	func setupAvatarImageView() {
+		contentView.addSubview(avatarImageView)
+		avatarImageView.contentMode = .scaleAspectFill
+		avatarImageView.clipsToBounds = true
+		avatarImageView.layer.cornerRadius = ReviewCellLayout.avatarCornerRadius
+	
+		avatarImageView.image = UIImage(named: "l5w5aIHioYc")
+	}
 
 }
 
@@ -130,6 +142,7 @@ private final class ReviewCellLayout {
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
+	private(set) var avatarImageViewFrame = CGRect.zero
 
     // MARK: - Отступы
 
@@ -162,6 +175,12 @@ private final class ReviewCellLayout {
         var maxY = insets.top
         var showShowMoreButton = false
 
+		avatarImageViewFrame = CGRect(
+			origin: CGPoint(x: insets.left, y: maxY),
+			size: Self.avatarSize
+		)
+		maxY = avatarImageViewFrame.maxY + usernameToRatingSpacing
+		
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
             let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
