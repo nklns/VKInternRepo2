@@ -48,11 +48,13 @@ private extension ReviewsViewModel {
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
         do {
             let data = try result.get()
+			decoder.keyDecodingStrategy = .convertFromSnakeCase
             let reviews = try decoder.decode(Reviews.self, from: data)
             state.items += reviews.items.map(makeReviewItem)
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
         } catch {
+			print("Ошибка декодирования отзывов: \(error)")
             state.shouldLoad = true
         }
         onStateChange?(state)
@@ -79,13 +81,16 @@ private extension ReviewsViewModel {
     typealias ReviewItem = ReviewCellConfig
 
     func makeReviewItem(_ review: Review) -> ReviewItem {
+		let fullNameString = "\(review.firstName) \(review.lastName)"
+		let fullName = fullNameString.attributed(font: .username, color: .label)
         let reviewText = review.text.attributed(font: .text)
         let created = review.created.attributed(font: .created, color: .created)
-        let item = ReviewItem(
-            reviewText: reviewText,
-            created: created,
-            onTapShowMore: showMoreReview
-        )
+		let item = ReviewItem(
+			fullName: fullName,
+			reviewText: reviewText,
+			created: created,
+			onTapShowMore: showMoreReview
+		)
         return item
     }
 
