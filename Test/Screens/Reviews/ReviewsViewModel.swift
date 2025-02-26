@@ -10,6 +10,11 @@ final class ReviewsViewModel: NSObject {
     private let reviewsProvider: ReviewsProvider
     private let ratingRenderer: RatingRenderer
     private let decoder: JSONDecoder
+	
+	/// Computed property, которое возвращает текущее количество элементов в списке отзывов.
+	var countOfItems: Int {
+		return state.items.count
+	}
 
     init(
         state: State = State(),
