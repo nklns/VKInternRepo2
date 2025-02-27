@@ -23,6 +23,7 @@ final class ReviewsViewController: UIViewController {
         super.viewDidLoad()
         setupViewModel()
         viewModel.getReviews()
+		RatingRenderer.shared.preloadCache()
     }
 
 }
@@ -39,8 +40,11 @@ private extension ReviewsViewController {
     }
 
     func setupViewModel() {
-        viewModel.onStateChange = { [weak reviewsView] _ in
-            reviewsView?.tableView.reloadData()
+		viewModel.onStateChange = { [weak self, weak reviewsView] _ in
+			DispatchQueue.main.async {
+				reviewsView?.tableView.reloadData()
+				reviewsView?.updateCountOfReviews(self?.viewModel.countOfItems ?? 0)
+			}
         }
     }
 

@@ -16,15 +16,19 @@ extension RatingRendererConfig {
 
     static func `default`() -> Self {
         let starSize = CGSize(width: 16.0, height: 16.0)
+		let numberOfStars = 5
+		let spacing: CGFloat = 1.0
+		
         let starImage = UIGraphicsImageRenderer(size: starSize).image {
             UIImage(systemName: "star.fill")?.draw(in: $0.cgContext.boundingBoxOfClipPath)
         }
         return RatingRendererConfig(
-            ratingRange: 1...5,
+            ratingRange: 1...numberOfStars,
             starImage: starImage,
             tintColor: .systemOrange,
             fadeColor: .systemGray4,
-            spacing: 1.0
+            spacing: spacing
+			
         )
     }
 
@@ -34,7 +38,8 @@ extension RatingRendererConfig {
 
 /// Класс рисует изображение рейтинга (звёзды) и кэширует его.
 final class RatingRenderer {
-
+	static let shared = RatingRenderer()
+	
     private let config: RatingRendererConfig
     private var images: [Int: UIImage]
     private let imageRenderer: UIGraphicsImageRenderer
@@ -63,6 +68,12 @@ extension RatingRenderer {
         self.init(config: config, images: [:], imageRenderer: UIGraphicsImageRenderer(size: size))
     }
 
+	func preloadCache() {
+		for rating in config.ratingRange {
+			_ = ratingImage(rating)
+		}
+	}
+	
     func ratingImage(_ rating: Int) -> UIImage {
         images[rating] ?? drawRatingImageAndCache(rating)
     }
