@@ -19,8 +19,6 @@ extension RatingRendererConfig {
 		let numberOfStars = 5
 		let spacing: CGFloat = 1.0
 		
-		let width = CGFloat(numberOfStars) * (starSize.width + spacing) - spacing
-		
         let starImage = UIGraphicsImageRenderer(size: starSize).image {
             UIImage(systemName: "star.fill")?.draw(in: $0.cgContext.boundingBoxOfClipPath)
         }
