@@ -41,13 +41,15 @@ extension ReviewsViewModel {
 		guard state.shouldLoad else { return }
 		state.shouldLoad = false
 
-		Task {
+		Task { [weak self] in
+			guard let self = self else { return }
 			do {
 				let data = try await reviewsProvider.getReviews(offset: state.offset)
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
 				let reviews = try decoder.decode(Reviews.self, from: data)
 				
-				await MainActor.run {
+				await MainActor.run { [weak self] in
+					guard let self = self else { return }
 					state.items += reviews.items.map(makeReviewItem)
 					state.offset += state.limit
 					state.shouldLoad = state.offset < reviews.count
@@ -55,7 +57,8 @@ extension ReviewsViewModel {
 				}
 			} catch {
 				print("Ошибка получения отзывов: \(error)")
-				await MainActor.run {
+				await MainActor.run {  [weak self] in
+					guard let self = self else { return }
 					state.shouldLoad = true
 					onStateChange?(state)
 				}
