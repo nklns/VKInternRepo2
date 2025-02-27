@@ -40,7 +40,8 @@ extension RatingRendererConfig {
 
 /// Класс рисует изображение рейтинга (звёзды) и кэширует его.
 final class RatingRenderer {
-
+	static let shared = RatingRenderer()
+	
     private let config: RatingRendererConfig
     private var images: [Int: UIImage]
     private let imageRenderer: UIGraphicsImageRenderer
@@ -69,6 +70,12 @@ extension RatingRenderer {
         self.init(config: config, images: [:], imageRenderer: UIGraphicsImageRenderer(size: size))
     }
 
+	func preloadCache() {
+		for rating in config.ratingRange {
+			_ = ratingImage(rating)
+		}
+	}
+	
     func ratingImage(_ rating: Int) -> UIImage {
         images[rating] ?? drawRatingImageAndCache(rating)
     }

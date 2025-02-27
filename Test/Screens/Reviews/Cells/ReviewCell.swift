@@ -36,7 +36,7 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
 		
-		cell.ratingImageView.image = RatingRenderer().ratingImage(rating)
+		cell.ratingImageView.image = RatingRenderer.shared.ratingImage(rating)
 		
         cell.config = self
     }

@@ -36,34 +36,38 @@ extension ReviewsViewModel {
 
     typealias State = ReviewsViewModelState
 
-    /// Метод получения отзывов.
-    func getReviews() {
-        guard state.shouldLoad else { return }
-        state.shouldLoad = false
-        reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
-    }
+	/// Метод получения отзывов.
+	func getReviews() {
+		guard state.shouldLoad else { return }
+		state.shouldLoad = false
 
+		Task {
+			do {
+				let data = try await reviewsProvider.getReviews(offset: state.offset)
+				decoder.keyDecodingStrategy = .convertFromSnakeCase
+				let reviews = try decoder.decode(Reviews.self, from: data)
+				
+				await MainActor.run {
+					state.items += reviews.items.map(makeReviewItem)
+					state.offset += state.limit
+					state.shouldLoad = state.offset < reviews.count
+					onStateChange?(state)
+				}
+			} catch {
+				print("Ошибка получения отзывов: \(error)")
+				await MainActor.run {
+					state.shouldLoad = true
+					onStateChange?(state)
+				}
+			}
+		}
+	}
+	
 }
 
 // MARK: - Private
 
 private extension ReviewsViewModel {
-
-    /// Метод обработки получения отзывов.
-    func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
-        do {
-            let data = try result.get()
-			decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let reviews = try decoder.decode(Reviews.self, from: data)
-            state.items += reviews.items.map(makeReviewItem)
-            state.offset += state.limit
-            state.shouldLoad = state.offset < reviews.count
-        } catch {
-			print("Ошибка декодирования отзывов: \(error)")
-            state.shouldLoad = true
-        }
-        onStateChange?(state)
-    }
 
     /// Метод, вызываемый при нажатии на кнопку "Показать полностью...".
     /// Снимает ограничение на количество строк текста отзыва (раскрывает текст).

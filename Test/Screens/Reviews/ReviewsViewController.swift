@@ -23,6 +23,7 @@ final class ReviewsViewController: UIViewController {
         super.viewDidLoad()
         setupViewModel()
         viewModel.getReviews()
+		RatingRenderer.shared.preloadCache()
     }
 
 }
