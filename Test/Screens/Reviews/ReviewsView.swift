@@ -36,6 +36,8 @@ private extension ReviewsView {
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
+		tableView.rowHeight = UITableView.automaticDimension
+		tableView.estimatedRowHeight = 100
 		
 		tableView.tableFooterView = footerLabel
     }
