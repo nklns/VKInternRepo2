@@ -123,6 +123,7 @@ private extension ReviewCell {
 		contentView.addSubview(showMoreButton)
 		showMoreButton.contentVerticalAlignment = .fill
 		showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+		showMoreButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
 	}
 	
 	func setupAvatarImageView() {
@@ -255,6 +256,16 @@ private final class ReviewCellLayout {
 		return createdLabelFrame.maxY + insets.bottom
 	}
 
+}
+
+// MARK: - Actions
+
+private extension ReviewCell {
+	@objc
+	func buttonTapped() {
+		guard let config = config else { return }
+		config.onTapShowMore(config.id)
+	}
 }
 
 // MARK: - Typealias

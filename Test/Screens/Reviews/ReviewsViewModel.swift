@@ -10,11 +10,6 @@ final class ReviewsViewModel: NSObject {
     private let reviewsProvider: ReviewsProvider
     private let ratingRenderer: RatingRenderer
     private let decoder: JSONDecoder
-	
-	/// Computed property, которое возвращает текущее количество элементов в списке отзывов.
-	var countOfItems: Int {
-		return state.items.count
-	}
 
     init(
         state: State = State(),
@@ -40,11 +35,16 @@ extension ReviewsViewModel {
 	func getReviews() {
 		guard state.shouldLoad else { return }
 		state.shouldLoad = false
-
+		
+		if state.items.isEmpty {
+			state.isLoading = true
+			onStateChange?(state)
+		}
+		
 		Task { [weak self] in
 			guard let self = self else { return }
 			do {
-				let data = try await reviewsProvider.getReviews(offset: state.offset)
+				let data = try await reviewsProvider.getReviews()
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
 				let reviews = try decoder.decode(Reviews.self, from: data)
 				
@@ -53,6 +53,7 @@ extension ReviewsViewModel {
 					state.items += reviews.items.map(makeReviewItem)
 					state.offset += state.limit
 					state.shouldLoad = state.offset < reviews.count
+					state.isLoading = false
 					onStateChange?(state)
 				}
 			} catch {

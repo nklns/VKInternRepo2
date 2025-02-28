@@ -1,9 +1,18 @@
 import UIKit
 
+protocol ReviewsViewDelegate: AnyObject {
+	func didUseRefreshControl()
+}
+
 final class ReviewsView: UIView {
 
+	private let refreshControl = UIRefreshControl()
+	let activityIndicatorView = UIActivityIndicatorView()
+	
     let tableView = UITableView()
 	let footerLabel = UILabel()
+	
+	weak var delegate: ReviewsViewDelegate?
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -21,6 +30,15 @@ final class ReviewsView: UIView {
 
 }
 
+// MARK: - Internal
+
+extension ReviewsView {
+	
+	func updateCountOfReviews(_ count: Int) {
+		footerLabel.text = "\(count) отзывов"
+	}
+}
+
 // MARK: - Private
 
 private extension ReviewsView {
@@ -29,8 +47,24 @@ private extension ReviewsView {
         backgroundColor = .systemBackground
         setupTableView()
 		setupFooterLabel()
+		setupRefreshControl()
+		setupActivityIndicatorView()
+		setupConstraints()
     }
 
+	func setupActivityIndicatorView() {
+		addSubview(activityIndicatorView)
+		activityIndicatorView.color = .label
+		activityIndicatorView.style = .large
+		activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
+
+	}
+	
+	func setupRefreshControl() {
+		tableView.refreshControl = refreshControl
+		refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+	}
+	
     func setupTableView() {
         addSubview(tableView)
         tableView.separatorStyle = .none
@@ -38,26 +72,41 @@ private extension ReviewsView {
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
 		tableView.rowHeight = UITableView.automaticDimension
 		tableView.estimatedRowHeight = 100
-		
-		tableView.tableFooterView = footerLabel
     }
 	
 	func setupFooterLabel() {
-		footerLabel.text = "0 отзывов"
 		footerLabel.textAlignment = .center
 		footerLabel.font = .reviewCount
 		footerLabel.textColor = .reviewCount
 		footerLabel.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 40)
+		
+		tableView.tableFooterView = footerLabel
 	}
 
 }
 
-// MARK: - Internal
+// MARK: - Layout
 
-extension ReviewsView {
+private extension ReviewsView {
 	
-	func updateCountOfReviews(_ count: Int) {
-		footerLabel.text = "\(count) отзывов"
+	func setupConstraints() {
+		// ActivityIndicator
+		NSLayoutConstraint.activate([
+			activityIndicatorView.centerXAnchor.constraint(equalTo: centerXAnchor),
+			activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor)
+		])
+	}
+	
+}
+
+// MARK: - Actions
+
+private extension ReviewsView {
+	
+	@objc
+	func refreshData() {
+		delegate?.didUseRefreshControl()
+		refreshControl.endRefreshing()
 	}
 	
 }

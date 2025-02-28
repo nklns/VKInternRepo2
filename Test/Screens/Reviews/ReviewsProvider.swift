@@ -21,7 +21,7 @@ extension ReviewsProvider {
 	}
 	
 	/// Асинхронный метод получения отзывов с симуляцией сетевого запроса.
-	func getReviews(offset: Int = 0) async throws -> Data {
+	func getReviews() async throws -> Data {
 		guard let url = bundle.url(forResource: "getReviews.response", withExtension: "json") else {
 			throw GetReviewsError.badURL
 		}

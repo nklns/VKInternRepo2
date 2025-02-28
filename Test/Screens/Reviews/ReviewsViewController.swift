@@ -36,16 +36,28 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
+		reviewsView.delegate = self
         return reviewsView
     }
 
     func setupViewModel() {
-		viewModel.onStateChange = { [weak self, weak reviewsView] _ in
+		viewModel.onStateChange = { [weak reviewsView] state in
 			DispatchQueue.main.async {
 				reviewsView?.tableView.reloadData()
-				reviewsView?.updateCountOfReviews(self?.viewModel.countOfItems ?? 0)
+				reviewsView?.updateCountOfReviews(state.items.count)
+				state.isLoading ? reviewsView?.activityIndicatorView.startAnimating() : reviewsView?.activityIndicatorView.stopAnimating()
 			}
         }
     }
 
+}
+
+// MARK: - ReviewsViewDelegate
+
+extension ReviewsViewController: ReviewsViewDelegate {
+	
+	func didUseRefreshControl() {
+		viewModel.getReviews()
+	}
+	
 }
