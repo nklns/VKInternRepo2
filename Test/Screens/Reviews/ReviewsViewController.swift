@@ -4,7 +4,6 @@ final class ReviewsViewController: UIViewController {
 
     private lazy var reviewsView = makeReviewsView()
     private let viewModel: ReviewsViewModel
-	private let refreshControl = UIRefreshControl()
 
     init(viewModel: ReviewsViewModel) {
         self.viewModel = viewModel
@@ -25,7 +24,6 @@ final class ReviewsViewController: UIViewController {
         setupViewModel()
         viewModel.getReviews()
 		RatingRenderer.shared.preloadCache()
-		setupRefreshControl()
     }
 
 }
@@ -38,7 +36,7 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
-		reviewsView.tableView.refreshControl = refreshControl
+		reviewsView.delegate = self
         return reviewsView
     }
 
@@ -50,31 +48,15 @@ private extension ReviewsViewController {
 			}
         }
     }
-	
-	func setupRefreshControl() {
-		refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
-	}
 
 }
 
-// MARK: - Actions
+// MARK: - ReviewsViewDelegate
 
-private extension ReviewsViewController {
+extension ReviewsViewController: ReviewsViewDelegate {
 	
-	@objc
-	func refreshData() {
+	func didUseRefreshControl() {
 		viewModel.getReviews()
-		reviewsView.tableView.refreshControl?.endRefreshing()
-	}
-	
-}
-
-// MARK: - ReviewCellDelegate
-
-extension ReviewsViewController: ReviewCellDelegate {
-	
-	func showMoreButtonTapped(config: ReviewCellConfig) {
-		config.onTapShowMore(config.id)
 	}
 	
 }

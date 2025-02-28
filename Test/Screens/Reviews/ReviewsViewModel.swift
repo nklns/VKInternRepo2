@@ -44,7 +44,7 @@ extension ReviewsViewModel {
 		Task { [weak self] in
 			guard let self = self else { return }
 			do {
-				let data = try await reviewsProvider.getReviews(offset: state.offset)
+		let data = try await reviewsProvider.getReviews()
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
 				let reviews = try decoder.decode(Reviews.self, from: data)
 				

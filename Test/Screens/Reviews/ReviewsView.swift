@@ -1,9 +1,18 @@
 import UIKit
 
+protocol ReviewsViewDelegate: AnyObject {
+	
+	func didUseRefreshControl()
+	
+}
+
 final class ReviewsView: UIView {
 
+	private let refreshControl = UIRefreshControl()
     let tableView = UITableView()
 	let footerLabel = UILabel()
+	
+	weak var delegate: ReviewsViewDelegate?
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -21,6 +30,16 @@ final class ReviewsView: UIView {
 
 }
 
+// MARK: - Internal
+
+extension ReviewsView {
+	
+	func updateCountOfReviews(_ count: Int) {
+		footerLabel.text = "\(count) отзывов"
+	}
+	
+}
+
 // MARK: - Private
 
 private extension ReviewsView {
@@ -29,8 +48,14 @@ private extension ReviewsView {
         backgroundColor = .systemBackground
         setupTableView()
 		setupFooterLabel()
+		setupRefreshControl()
     }
 
+	func setupRefreshControl() {
+		tableView.refreshControl = refreshControl
+		refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+	}
+	
     func setupTableView() {
         addSubview(tableView)
         tableView.separatorStyle = .none
@@ -52,12 +77,14 @@ private extension ReviewsView {
 
 }
 
-// MARK: - Internal
+// MARK: - Actions
 
-extension ReviewsView {
+private extension ReviewsView {
 	
-	func updateCountOfReviews(_ count: Int) {
-		footerLabel.text = "\(count) отзывов"
+	@objc
+	func refreshData() {
+		delegate?.didUseRefreshControl()
+		refreshControl.endRefreshing()
 	}
 	
 }
