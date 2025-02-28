@@ -50,8 +50,10 @@ extension ReviewsViewModel {
 				
 				await MainActor.run { [weak self] in
 					guard let self = self else { return }
-					state.items += reviews.items.map(makeReviewItem)
+					state.items += Array(reviews.items.map(makeReviewItem).prefix(state.limit))
 					state.offset += state.limit
+					let remainingReviewsCount = reviews.count - state.offset
+					state.limit = remainingReviewsCount < state.limit ? remainingReviewsCount : state.limit
 					state.shouldLoad = state.offset < reviews.count
 					state.isLoading = false
 					onStateChange?(state)
