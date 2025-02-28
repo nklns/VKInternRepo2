@@ -62,11 +62,20 @@ private extension ReviewCellConfig {
 
 }
 
+// MARK: - Delegate
+
+protocol ReviewCellDelegate: AnyObject {
+	
+	func showMoreButtonTapped(config: ReviewCellConfig)
+	
+}
+
 // MARK: - Cell
 
 final class ReviewCell: UITableViewCell {
 
 	fileprivate var config: Config?
+	weak var delegate: ReviewCellDelegate?
 	
 	fileprivate let fullNameLabel = UILabel()
 	fileprivate let reviewTextLabel = UILabel()
@@ -264,7 +273,7 @@ private extension ReviewCell {
 	@objc
 	func buttonTapped() {
 		guard let config = config else { return }
-		config.onTapShowMore(config.id)
+		delegate?.showMoreButtonTapped(config: config)
 	}
 }
 
