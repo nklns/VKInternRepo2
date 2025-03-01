@@ -53,10 +53,10 @@ extension ReviewsViewModel {
 					let item = try await makeReviewItem(review)
 					newItems.append(item)
 				}
+				state.items += newItems
 				
 				await MainActor.run { [weak self] in
 					guard let self = self else { return }
-					state.items += newItems
 					state.offset = state.items.count
 					let remainingReviewsCount = reviews.count - state.offset
 					state.limit = min(remainingReviewsCount, state.limit)
