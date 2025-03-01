@@ -47,13 +47,19 @@ extension ReviewsViewModel {
 				let data = try await reviewsProvider.getReviews()
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
 				let reviews = try decoder.decode(Reviews.self, from: data)
+				let prefixCount = state.limit
+				var newItems = [ReviewItem]()
+				for review in reviews.items.prefix(prefixCount) {
+					let item = try await makeReviewItem(review)
+					newItems.append(item)
+				}
 				
 				await MainActor.run { [weak self] in
 					guard let self = self else { return }
-					state.items += Array(reviews.items.map(makeReviewItem).prefix(state.limit))
-					state.offset += state.limit
+					state.items += newItems
+					state.offset = state.items.count
 					let remainingReviewsCount = reviews.count - state.offset
-					state.limit = remainingReviewsCount < state.limit ? remainingReviewsCount : state.limit
+					state.limit = min(remainingReviewsCount, state.limit)
 					state.shouldLoad = state.offset < reviews.count
 					state.isLoading = false
 					onStateChange?(state)
@@ -63,6 +69,7 @@ extension ReviewsViewModel {
 				await MainActor.run {  [weak self] in
 					guard let self = self else { return }
 					state.shouldLoad = true
+					state.isLoading = false
 					onStateChange?(state)
 				}
 			}
@@ -86,6 +93,31 @@ private extension ReviewsViewModel {
         state.items[index] = item
         onStateChange?(state)
     }
+	
+	// TODO: - При возможности переписать на Generic
+	
+	func downloadImage(from url: URL?) async throws -> UIImage  {
+		guard let url = url else { throw NetworkErrors.invalidURL }
+		let (data, _) = try await URLSession.shared.data(from: url)
+		guard let image = UIImage(data: data) else { throw NetworkErrors.decodingFailed }
+		return image
+	}
+	
+	func fetchImages(photoUrls: [URL]) async throws -> [UIImage] {
+		let result = try await withThrowingTaskGroup(of: UIImage.self, returning: [UIImage].self) { taskGroup in
+			for url in photoUrls {
+				taskGroup.addTask {
+					try await self.downloadImage(from: url)
+				}
+			}
+			var images = [UIImage]()
+			for try await image in taskGroup {
+				images.append(image)
+			}
+			return images
+		}
+		return result
+	}
 
 }
 
@@ -95,14 +127,22 @@ private extension ReviewsViewModel {
 
     typealias ReviewItem = ReviewCellConfig
 
-    func makeReviewItem(_ review: Review) -> ReviewItem {
+	func makeReviewItem(_ review: Review) async throws -> ReviewItem {
 		let fullNameString = "\(review.firstName) \(review.lastName)"
+		let urls = review.photoUrls.compactMap { URL(string: $0) }
+		guard let avatarUrl = URL(string: review.avatarUrl) else {
+			throw NetworkErrors.invalidURL
+		}
+		let avatarPhoto = try await downloadImage(from: avatarUrl)
+		let photosImages = try await fetchImages(photoUrls: urls)
 		let fullName = fullNameString.attributed(font: .username, color: .label)
         let reviewText = review.text.attributed(font: .text)
         let created = review.created.attributed(font: .created, color: .created)
 		let item = ReviewItem(
 			fullName: fullName,
 			rating: review.rating,
+			avatar: avatarPhoto,
+			photos: photosImages,
 			reviewText: reviewText,
 			created: created,
 			onTapShowMore: showMoreReview

@@ -12,6 +12,10 @@ struct ReviewCellConfig {
 	let fullName: NSAttributedString
 	/// Рейтинг отзыва.
 	let rating: Int
+	/// Аватар отзыва.
+	let avatar: UIImage
+	/// Фото отзыва.
+	let photos: [UIImage]
 	/// Текст отзыва.
 	let reviewText: NSAttributedString
 	/// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -38,6 +42,7 @@ extension ReviewCellConfig: TableCellConfig {
 		cell.reviewTextLabel.attributedText = reviewText
 		cell.reviewTextLabel.numberOfLines = maxLines
 		cell.createdLabel.attributedText = created
+		cell.avatarImageView.image = avatar
 		
 		cell.ratingImageView.image = RatingRenderer().ratingImage(rating)
 		
@@ -131,8 +136,6 @@ private extension ReviewCell {
 		avatarImageView.contentMode = .scaleAspectFill
 		avatarImageView.clipsToBounds = true
 		avatarImageView.layer.cornerRadius = ReviewCellLayout.avatarCornerRadius
-	
-		avatarImageView.image = UIImage(named: "l5w5aIHioYc")
 	}
 	
 	func setupFullNameLabel() {
