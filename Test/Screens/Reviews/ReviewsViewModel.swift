@@ -96,10 +96,14 @@ private extension ReviewsViewModel {
 	
 	// TODO: - При возможности переписать на Generic
 	
-	func downloadImage(from url: URL?) async throws -> UIImage  {
-		guard let url = url else { throw NetworkErrors.invalidURL }
+	func downloadImage(from url: URL) async throws -> UIImage  {
+		let key = url.absoluteString as NSString
+		if let cachedImage = ImageCache.shared.object(forKey: key) {
+			return cachedImage
+		}
 		let (data, _) = try await URLSession.shared.data(from: url)
 		guard let image = UIImage(data: data) else { throw NetworkErrors.decodingFailed }
+		ImageCache.shared.setObject(image, forKey: key)
 		return image
 	}
 	
