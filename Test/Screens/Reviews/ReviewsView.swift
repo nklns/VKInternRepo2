@@ -37,6 +37,7 @@ extension ReviewsView {
 	func updateCountOfReviews(_ count: Int) {
 		footerLabel.text = "\(count) отзывов"
 	}
+	
 }
 
 // MARK: - Private
@@ -90,7 +91,6 @@ private extension ReviewsView {
 private extension ReviewsView {
 	
 	func setupConstraints() {
-		// ActivityIndicator
 		NSLayoutConstraint.activate([
 			activityIndicatorView.centerXAnchor.constraint(equalTo: centerXAnchor),
 			activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor)

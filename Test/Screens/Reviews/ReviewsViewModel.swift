@@ -5,6 +5,7 @@ final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
     var onStateChange: ((State) -> Void)?
+	var didImageTapped: ((UIImage) -> Void)?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -47,11 +48,19 @@ extension ReviewsViewModel {
 				let data = try await reviewsProvider.getReviews()
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
 				let reviews = try decoder.decode(Reviews.self, from: data)
+				let prefixCount = state.limit
+				var newItems = [ReviewItem]()
+				for review in reviews.items.prefix(prefixCount) {
+					let item = try await makeReviewItem(review)
+					newItems.append(item)
+				}
+				state.items += newItems
 				
 				await MainActor.run { [weak self] in
 					guard let self = self else { return }
-					state.items += reviews.items.map(makeReviewItem)
-					state.offset += state.limit
+					state.offset = state.items.count
+					let remainingReviewsCount = reviews.count - state.offset
+					state.limit = min(remainingReviewsCount, state.limit)
 					state.shouldLoad = state.offset < reviews.count
 					state.isLoading = false
 					onStateChange?(state)
@@ -61,6 +70,7 @@ extension ReviewsViewModel {
 				await MainActor.run {  [weak self] in
 					guard let self = self else { return }
 					state.shouldLoad = true
+					state.isLoading = false
 					onStateChange?(state)
 				}
 			}
@@ -84,6 +94,33 @@ private extension ReviewsViewModel {
         state.items[index] = item
         onStateChange?(state)
     }
+	
+	func downloadImage(from url: URL) async throws -> UIImage  {
+		let key = url.absoluteString as NSString
+		if let cachedImage = ImageCache.shared.object(forKey: key) {
+			return cachedImage
+		}
+		let (data, _) = try await URLSession.shared.data(from: url)
+		guard let image = UIImage(data: data) else { throw NetworkErrors.decodingFailed }
+		ImageCache.shared.setObject(image, forKey: key)
+		return image
+	}
+	
+	func fetchImages(photoUrls: [URL]) async throws -> [UIImage] {
+		let result = try await withThrowingTaskGroup(of: UIImage.self, returning: [UIImage].self) { taskGroup in
+			for url in photoUrls {
+				taskGroup.addTask {
+					try await self.downloadImage(from: url)
+				}
+			}
+			var images = [UIImage]()
+			for try await image in taskGroup {
+				images.append(image)
+			}
+			return images
+		}
+		return result
+	}
 
 }
 
@@ -93,14 +130,22 @@ private extension ReviewsViewModel {
 
     typealias ReviewItem = ReviewCellConfig
 
-    func makeReviewItem(_ review: Review) -> ReviewItem {
+	func makeReviewItem(_ review: Review) async throws -> ReviewItem {
 		let fullNameString = "\(review.firstName) \(review.lastName)"
+		let urls = review.photoUrls.compactMap { URL(string: $0) }
+		guard let avatarUrl = URL(string: review.avatarUrl) else {
+			throw NetworkErrors.invalidURL
+		}
+		let avatarPhoto = try await downloadImage(from: avatarUrl)
+		let photosImages = try await fetchImages(photoUrls: urls)
 		let fullName = fullNameString.attributed(font: .username, color: .label)
         let reviewText = review.text.attributed(font: .text)
         let created = review.created.attributed(font: .created, color: .created)
 		let item = ReviewItem(
 			fullName: fullName,
 			rating: review.rating,
+			avatar: avatarPhoto,
+			photos: photosImages,
 			reviewText: reviewText,
 			created: created,
 			onTapShowMore: showMoreReview
@@ -134,6 +179,11 @@ extension ReviewsViewModel: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		state.items[indexPath.row].height(with: tableView.bounds.size)
 	}
+	
+	func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+		guard let reviewCell = cell as? ReviewCell else { return }
+		reviewCell.delegate = self
+	}
 
     /// Метод дозапрашивает отзывы, если до конца списка отзывов осталось два с половиной экрана по высоте.
     func scrollViewWillEndDragging(
@@ -158,4 +208,14 @@ extension ReviewsViewModel: UITableViewDelegate {
         return remainingDistance <= triggerDistance
     }
 
+}
+
+// MARK: - ReviewCellDelegate
+
+extension ReviewsViewModel: ReviewCellDelegate {
+	
+	func imageTapped(image: UIImage) {
+		didImageTapped?(image)
+	}
+	
 }

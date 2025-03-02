@@ -21,9 +21,8 @@ final class ReviewsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViewModel()
-        viewModel.getReviews()
-		RatingRenderer.shared.preloadCache()
+		setupBindings()
+		fetchData()
     }
 
 }
@@ -31,24 +30,40 @@ final class ReviewsViewController: UIViewController {
 // MARK: - Private
 
 private extension ReviewsViewController {
+	
+	func setupBindings() {
+		setupViewModelBindings()
+		setupImageTapHandler()
+	}
+	
+	func fetchData() {
+		viewModel.getReviews()
+		RatingRenderer.shared.preloadCache()
+	}
 
-    func makeReviewsView() -> ReviewsView {
-        let reviewsView = ReviewsView()
-        reviewsView.tableView.delegate = viewModel
-        reviewsView.tableView.dataSource = viewModel
-		reviewsView.delegate = self
-        return reviewsView
-    }
-
-    func setupViewModel() {
+	func setupViewModelBindings() {
 		viewModel.onStateChange = { [weak reviewsView] state in
 			DispatchQueue.main.async {
 				reviewsView?.tableView.reloadData()
 				reviewsView?.updateCountOfReviews(state.items.count)
 				state.isLoading ? reviewsView?.activityIndicatorView.startAnimating() : reviewsView?.activityIndicatorView.stopAnimating()
 			}
-        }
-    }
+		}
+	}
+	
+	func setupImageTapHandler() {
+		viewModel.didImageTapped = { image in
+			self.navigationController?.pushViewController(ImageViewController(reviewImage: image), animated: true)
+		}
+	}
+	
+	func makeReviewsView() -> ReviewsView {
+		let reviewsView = ReviewsView()
+		reviewsView.tableView.delegate = viewModel
+		reviewsView.tableView.dataSource = viewModel
+		reviewsView.delegate = self
+		return reviewsView
+	}
 
 }
 
