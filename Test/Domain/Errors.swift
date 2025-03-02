@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NetworkErrors: LocalizedError {
+enum NetworkError: LocalizedError {
 	
 	case invalidURL
 	case noData

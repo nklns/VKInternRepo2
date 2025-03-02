@@ -12,8 +12,8 @@ final class ImageView: UIView {
 	private let reviewImageView = UIImageView()
 
 	init(reviewImage: UIImage) {
-		self.reviewImageView.image = reviewImage
 		super.init(frame: .zero)
+		self.reviewImageView.image = reviewImage
 		setupView()
 	}
 	
@@ -43,13 +43,7 @@ private extension ImageView {
 		reviewImageView.clipsToBounds = true
 	}
 	
-}
-
-// MARK: - Constraints
-
-private extension ImageView {
-	
-	private func setupConstraints() {
+	func setupConstraints() {
 		NSLayoutConstraint.activate([
 			reviewImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
 			reviewImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
