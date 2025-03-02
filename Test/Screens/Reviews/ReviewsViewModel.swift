@@ -5,7 +5,7 @@ final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
     var onStateChange: ((State) -> Void)?
-	var didImageTapped: ((UIImage) -> Void)?
+	var didTapImage: ((UIImage) -> Void)?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -101,7 +101,7 @@ private extension ReviewsViewModel {
 			return cachedImage
 		}
 		let (data, _) = try await URLSession.shared.data(from: url)
-		guard let image = UIImage(data: data) else { throw NetworkErrors.decodingFailed }
+		guard let image = UIImage(data: data) else { throw NetworkError.decodingFailed }
 		ImageCache.shared.setObject(image, forKey: key)
 		return image
 	}
@@ -134,7 +134,7 @@ private extension ReviewsViewModel {
 		let fullNameString = "\(review.firstName) \(review.lastName)"
 		let urls = review.photoUrls.compactMap { URL(string: $0) }
 		guard let avatarUrl = URL(string: review.avatarUrl) else {
-			throw NetworkErrors.invalidURL
+			throw NetworkError.invalidURL
 		}
 		let avatarPhoto = try await downloadImage(from: avatarUrl)
 		let photosImages = try await fetchImages(photoUrls: urls)
@@ -215,7 +215,7 @@ extension ReviewsViewModel: UITableViewDelegate {
 extension ReviewsViewModel: ReviewCellDelegate {
 	
 	func imageTapped(image: UIImage) {
-		didImageTapped?(image)
+		didTapImage?(image)
 	}
 	
 }

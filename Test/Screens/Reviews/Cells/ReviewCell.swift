@@ -45,7 +45,7 @@ extension ReviewCellConfig: TableCellConfig {
 		cell.avatarImageView.image = avatar
 		
 		cell.updatePhotos(photos: photos)
-		cell.ratingImageView.image = RatingRenderer().ratingImage(rating)
+		cell.ratingImageView.image = RatingRenderer.shared.ratingImage(rating)
 		
 		cell.config = self
 	}

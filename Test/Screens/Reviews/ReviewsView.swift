@@ -83,12 +83,6 @@ private extension ReviewsView {
 		
 		tableView.tableFooterView = footerLabel
 	}
-
-}
-
-// MARK: - Layout
-
-private extension ReviewsView {
 	
 	func setupConstraints() {
 		NSLayoutConstraint.activate([
@@ -96,7 +90,7 @@ private extension ReviewsView {
 			activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor)
 		])
 	}
-	
+
 }
 
 // MARK: - Actions
