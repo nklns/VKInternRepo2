@@ -8,6 +8,7 @@
 import Foundation
 
 enum NetworkErrors: LocalizedError {
+	
 	case invalidURL
 	case noData
 	case decodingFailed
@@ -22,4 +23,5 @@ enum NetworkErrors: LocalizedError {
 			return "Ошибка декодирования"
 		}
 	}
+	
 }

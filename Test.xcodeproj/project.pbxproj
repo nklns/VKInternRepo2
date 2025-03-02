@@ -28,6 +28,8 @@
 		21ED1F622D69CBCD0012D6F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F612D69CBCD0012D6F6 /* RootView.swift */; };
 		21ED1F652D69D0340012D6F6 /* ReviewsScreenFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */; };
 		854871EE2D7337530051FD65 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854871ED2D7337530051FD65 /* ImageCache.swift */; };
+		854871F02D7421E90051FD65 /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854871EF2D7421E90051FD65 /* ImageViewController.swift */; };
+		854871F32D7422050051FD65 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854871F22D7422050051FD65 /* ImageView.swift */; };
 		85E9DD252D7217DB00FAA355 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E9DD242D7217DB00FAA355 /* Errors.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +56,8 @@
 		21ED1F612D69CBCD0012D6F6 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsScreenFactory.swift; sourceTree = "<group>"; };
 		854871ED2D7337530051FD65 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		854871EF2D7421E90051FD65 /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
+		854871F22D7422050051FD65 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		85E9DD242D7217DB00FAA355 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -121,9 +125,9 @@
 		21B82E242D47B0640085DAA2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				854871F42D74439C0051FD65 /* Cache */,
 				21B841692D47BE780085DAA2 /* Responses */,
 				21B82E232D47B0640085DAA2 /* Assets.xcassets */,
-				854871ED2D7337530051FD65 /* ImageCache.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -131,6 +135,7 @@
 		21B82E2A2D47B0640085DAA2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				854871F12D7421F30051FD65 /* Image */,
 				21ED1F632D69CF860012D6F6 /* Root */,
 				21B82E372D47B1090085DAA2 /* Reviews */,
 			);
@@ -191,6 +196,23 @@
 				21ED1F612D69CBCD0012D6F6 /* RootView.swift */,
 			);
 			path = Root;
+			sourceTree = "<group>";
+		};
+		854871F12D7421F30051FD65 /* Image */ = {
+			isa = PBXGroup;
+			children = (
+				854871EF2D7421E90051FD65 /* ImageViewController.swift */,
+				854871F22D7422050051FD65 /* ImageView.swift */,
+			);
+			path = Image;
+			sourceTree = "<group>";
+		};
+		854871F42D74439C0051FD65 /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				854871ED2D7337530051FD65 /* ImageCache.swift */,
+			);
+			path = Cache;
 			sourceTree = "<group>";
 		};
 		85E9DD232D7217C700FAA355 /* Domain */ = {
@@ -278,12 +300,14 @@
 				21B8416D2D47C0E20085DAA2 /* ReviewsViewModelState.swift in Sources */,
 				21B82E2E2D47B0640085DAA2 /* ReviewCell.swift in Sources */,
 				21ED1F622D69CBCD0012D6F6 /* RootView.swift in Sources */,
+				854871F32D7422050051FD65 /* ImageView.swift in Sources */,
 				21667B802D4A25B2009AAA76 /* RatingRenderer.swift in Sources */,
 				216668712D48E4B2009AAA76 /* NSAttributedString+Ext.swift in Sources */,
 				21B82E362D47B0D80085DAA2 /* ReviewsProvider.swift in Sources */,
 				85E9DD252D7217DB00FAA355 /* Errors.swift in Sources */,
 				21ED1F602D69C85E0012D6F6 /* RootViewController.swift in Sources */,
 				21B82E342D47B0AA0085DAA2 /* ReviewsViewModel.swift in Sources */,
+				854871F02D7421E90051FD65 /* ImageViewController.swift in Sources */,
 				854871EE2D7337530051FD65 /* ImageCache.swift in Sources */,
 				21B8416B2D47BFA10085DAA2 /* Reviews.swift in Sources */,
 				21B82E302D47B0640085DAA2 /* ReviewsViewController.swift in Sources */,

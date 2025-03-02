@@ -5,7 +5,7 @@ final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
     var onStateChange: ((State) -> Void)?
-	var didImageTapped: ((UIView) -> Void)?
+	var didImageTapped: ((UIImage) -> Void)?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -94,8 +94,6 @@ private extension ReviewsViewModel {
         state.items[index] = item
         onStateChange?(state)
     }
-	
-	// TODO: - При возможности переписать на Generic
 	
 	func downloadImage(from url: URL) async throws -> UIImage  {
 		let key = url.absoluteString as NSString
@@ -216,8 +214,8 @@ extension ReviewsViewModel: UITableViewDelegate {
 
 extension ReviewsViewModel: ReviewCellDelegate {
 	
-	func imageTapped(view: UIView) {
-		didImageTapped?(view)
+	func imageTapped(image: UIImage) {
+		didImageTapped?(image)
 	}
 	
 }

@@ -52,8 +52,8 @@ private extension ReviewsViewController {
 	}
 	
 	func setupImageTapHandler() {
-		viewModel.didImageTapped = { view in
-			
+		viewModel.didImageTapped = { image in
+			self.navigationController?.pushViewController(ImageViewController(reviewImage: image), animated: true)
 		}
 	}
 	

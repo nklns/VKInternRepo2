@@ -69,7 +69,7 @@ private extension ReviewCellConfig {
 }
 
 protocol ReviewCellDelegate: AnyObject {
-	func imageTapped(view: UIView)
+	func imageTapped(image: UIImage)
 }
 
 // MARK: - Cell
@@ -324,8 +324,8 @@ private extension ReviewCell {
 	
 	@objc
 	func didTapImage(_ sender: UITapGestureRecognizer) {
-		guard let view = sender.view else { return }
-		delegate?.imageTapped(view: view)
+		guard let imageView = sender.view as? UIImageView, let image = imageView.image else { return }
+		delegate?.imageTapped(image: image)
 	}
 	
 }
