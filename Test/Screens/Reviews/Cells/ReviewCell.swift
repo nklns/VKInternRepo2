@@ -68,11 +68,16 @@ private extension ReviewCellConfig {
 
 }
 
+protocol ReviewCellDelegate: AnyObject {
+	func imageTapped(view: UIView)
+}
+
 // MARK: - Cell
 
 final class ReviewCell: UITableViewCell {
 
 	fileprivate var config: Config?
+	weak var delegate: ReviewCellDelegate?
 	
 	fileprivate let fullNameLabel = UILabel()
 	fileprivate let reviewTextLabel = UILabel()
@@ -115,6 +120,9 @@ extension ReviewCell {
 			let imageView = UIImageView(image: image)
 			imageView.contentMode = .scaleAspectFill
 			imageView.clipsToBounds = true
+			imageView.isUserInteractionEnabled = true
+			let tap = UITapGestureRecognizer(target: self, action: #selector(didTapImage))
+			imageView.addGestureRecognizer(tap)
 			imageView.layer.cornerRadius = ReviewCellLayout.photoCornerRadius
 			imagesStackView.addArrangedSubview(imageView)
 		}
@@ -307,11 +315,19 @@ private final class ReviewCellLayout {
 // MARK: - Actions
 
 private extension ReviewCell {
+	
 	@objc
 	func buttonTapped() {
 		guard let config = config else { return }
 		config.onTapShowMore(config.id)
 	}
+	
+	@objc
+	func didTapImage(_ sender: UITapGestureRecognizer) {
+		guard let view = sender.view else { return }
+		delegate?.imageTapped(view: view)
+	}
+	
 }
 
 // MARK: - Typealias

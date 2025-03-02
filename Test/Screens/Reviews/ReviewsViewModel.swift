@@ -5,6 +5,7 @@ final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
     var onStateChange: ((State) -> Void)?
+	var didImageTapped: ((UIView) -> Void)?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -180,6 +181,11 @@ extension ReviewsViewModel: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		state.items[indexPath.row].height(with: tableView.bounds.size)
 	}
+	
+	func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+		guard let reviewCell = cell as? ReviewCell else { return }
+		reviewCell.delegate = self
+	}
 
     /// Метод дозапрашивает отзывы, если до конца списка отзывов осталось два с половиной экрана по высоте.
     func scrollViewWillEndDragging(
@@ -204,4 +210,14 @@ extension ReviewsViewModel: UITableViewDelegate {
         return remainingDistance <= triggerDistance
     }
 
+}
+
+// MARK: - ReviewCellDelegate
+
+extension ReviewsViewModel: ReviewCellDelegate {
+	
+	func imageTapped(view: UIView) {
+		didImageTapped?(view)
+	}
+	
 }
